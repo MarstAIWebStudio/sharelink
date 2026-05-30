@@ -117,7 +117,7 @@ async function startScreenShare() {
   try {
     const stream = await navigator.mediaDevices.getDisplayMedia({
       video: { frameRate: 30 },
-      audio: true
+      audio: false
     });
 
     // 마이크 추가

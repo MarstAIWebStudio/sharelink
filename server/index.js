@@ -17,7 +17,7 @@ const io = new Server(server, {
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../client/public')));
+app.use(express.static(path.join(__dirname, '../client/public'), { setHeaders: (res, path) => { if (path.endsWith('.css')) res.setHeader('Content-Type', 'text/css'); if (path.endsWith('.js')) res.setHeader('Content-Type', 'application/javascript'); } }));
 
 // 방 목록: { roomId: { host: socketId, participants: [socketId, ...], hostAllowsMouse: bool } }
 const rooms = {};

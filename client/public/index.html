@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShareLink — 화면 공유</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ══════════════ 홈 화면 ══════════════ -->
+<div id="home-screen" class="screen active">
+  <div class="home-bg">
+    <div class="grid-overlay"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+  </div>
+  <div class="home-content">
+    <div class="logo">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">ShareLink</span>
+    </div>
+    <h1 class="hero-title">화면을<br/><em>공유하세요</em></h1>
+    <p class="hero-sub">실시간 화면 공유 · 원격 마우스 제어 · 팀 협업</p>
+
+    <div class="home-actions">
+      <div class="input-group">
+        <input type="text" id="nickname-input" placeholder="닉네임 입력" maxlength="20"/>
+      </div>
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="create-room-btn">
+          <span class="btn-icon">＋</span> 방 만들기
+        </button>
+        <div class="divider-or">또는</div>
+        <div class="join-row">
+          <input type="text" id="room-code-input" placeholder="방 코드 입력" maxlength="8"/>
+          <button class="btn btn-secondary" id="join-room-btn">입장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 호스트 화면 ══════════════ -->
+<div id="host-screen" class="screen">
+  <div class="share-area" id="share-preview-area">
+    <div class="share-placeholder" id="share-placeholder">
+      <div class="placeholder-icon">🖥️</div>
+      <p>공유할 화면을 선택하세요</p>
+      <button class="btn btn-primary" id="start-share-btn">화면 공유 시작</button>
+    </div>
+    <video id="local-video" autoplay muted playsinline></video>
+    <div class="pause-overlay" id="pause-overlay">
+      <div class="pause-icon">⏸</div>
+      <p>일시정지됨</p>
+    </div>
+    <!-- 원격 커서들 -->
+    <div id="remote-cursors"></div>
+  </div>
+
+  <!-- 방 코드 배지 -->
+  <div class="room-badge" id="room-badge">
+    <span class="room-badge-label">방 코드</span>
+    <span class="room-badge-code" id="room-code-display"></span>
+    <button class="copy-btn" id="copy-code-btn" title="복사">⎘</button>
+  </div>
+
+  <!-- 컨트롤 바 -->
+  <div class="control-bar" id="control-bar">
+    <div class="bar-handle">⋮⋮</div>
+    <div class="bar-buttons">
+      <button class="bar-btn danger" id="stop-share-btn" title="공유 중지">
+        <span class="bar-icon">⬛</span>
+        <span class="bar-label">중지</span>
+      </button>
+      <div class="bar-sep"></div>
+      <button class="bar-btn" id="mic-btn" title="마이크">
+        <span class="bar-icon" id="mic-icon">🎤</span>
+        <span class="bar-label">마이크</span>
+      </button>
+      <button class="bar-btn" id="switch-screen-btn" title="창 바꾸기">
+        <span class="bar-icon">🔄</span>
+        <span class="bar-label">창 바꾸기</span>
+      </button>
+      <button class="bar-btn" id="remote-mouse-btn" title="상대 마우스">
+        <span class="bar-icon">🖱️</span>
+        <span class="bar-label">원격 마우스</span>
+      </button>
+      <button class="bar-btn" id="pause-btn" title="일시정지">
+        <span class="bar-icon" id="pause-icon">⏸</span>
+        <span class="bar-label">일시정지</span>
+      </button>
+      <div class="bar-sep"></div>
+      <button class="bar-btn" id="participants-btn" title="참여자">
+        <span class="bar-icon">👥</span>
+        <span class="bar-label">참여자 <span id="participant-count">0</span></span>
+      </button>
+      <button class="bar-btn" id="hide-bar-btn" title="바 숨기기">
+        <span class="bar-icon">✕</span>
+        <span class="bar-label">숨기기</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 바 숨김 시 복원 버튼 -->
+  <button class="restore-bar-btn" id="restore-bar-btn" title="컨트롤 바 보이기">⬆</button>
+</div>
+
+<!-- ══════════════ 뷰어 화면 ══════════════ -->
+<div id="viewer-screen" class="screen">
+  <div class="viewer-area">
+    <video id="remote-video" autoplay playsinline></video>
+    <div class="pause-overlay" id="viewer-pause-overlay">
+      <div class="pause-icon">⏸</div>
+      <p>호스트가 일시정지했습니다</p>
+    </div>
+    <div id="viewer-remote-cursors"></div>
+  </div>
+  <div class="viewer-info">
+    <span class="viewer-room-code" id="viewer-room-code"></span>
+    <span class="viewer-status" id="viewer-status">연결 중...</span>
+  </div>
+</div>
+
+<!-- ══════════════ 참여자 패널 ══════════════ -->
+<div class="panel" id="participants-panel">
+  <div class="panel-header">
+    <span>참여자</span>
+    <button class="panel-close" id="close-participants">✕</button>
+  </div>
+  <ul class="participant-list" id="participant-list"></ul>
+</div>
+<div class="panel-backdrop" id="panel-backdrop"></div>
+
+<!-- ══════════════ 토스트 알림 ══════════════ -->
+<div id="toast-container"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
